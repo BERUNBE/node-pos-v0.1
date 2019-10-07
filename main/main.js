@@ -1,11 +1,11 @@
 module.exports = function main(inputs) {
     console.log("Debug Info");
-    return printInventory(inputs);
+    return printReceipt(inputs);
 
-    function printInventory(inputs) {
-        var output = "***<store earning no money>Receipt ***\n";
-        var uniqueBarcodes = [];
-        var uniqueItems = [];
+    function printReceipt(inputs) {
+        let output = "***<store earning no money>Receipt ***\n";
+        let uniqueBarcodes = [];
+        let uniqueItems = [];
 
         inputs.forEach(function(input) {
             if(!uniqueBarcodes.includes(input.Barcode)) {
@@ -14,30 +14,36 @@ module.exports = function main(inputs) {
             }
         });
 
-        var total = 0;
+        let totalPrice = 0;
         uniqueItems.forEach(function(item) {
-            var items = inputs.filter(input => input.Barcode == item.Barcode);
-            var prices = items.map(item => item.Price);
-            var reducer = (accumulator, currentValue) => accumulator + currentValue;
-            var totalPrice = prices.reduce(reducer);
-            total += totalPrice;
-            var unit = getUnit(item.Unit, items.length);
-            output += "Name: " + item.Name + ", Quantity: " + items.length + unit + ", Unit price: " + item.Price.toFixed(2) + " (yuan), Subtotal: " + totalPrice.toFixed(2) + " (yuan)\n";
+            let items = inputs.filter(input => input.Barcode == item.Barcode);
+            let subTotalPrice = getSubTotalPrice(items);
+            totalPrice += subTotalPrice;
+            let unit = getUnit(item.Unit, items.length);
+            output += "Name: " + item.Name + ", Quantity: " + items.length + unit + ", Unit price: " + item.Price.toFixed(2) + " (yuan), Subtotal: " + subTotalPrice.toFixed(2) + " (yuan)\n";
         });
 
         output += "----------------------\n";
-        output += "Total: " + total.toFixed(2) + " (yuan)\n";
-        output += "**********************\n"
-
-        function getUnit(unitName, itemQty){
-            if(itemQty > 1) {
-                return " " + unitName + "s";
-            } else {
-                return "";
-            }
-        }
+        output += "Total: " + totalPrice.toFixed(2) + " (yuan)\n";
+        output += "**********************\n";
 
         return output;
+    }
+
+    function getSubTotalPrice(items) {
+        return items.map(item => item.Price)
+            .reduce((a, b) => a + b, 0);
+    }
+
+    function getUnit(unitName, itemQty){
+        if (unitName == "a") {
+            return "";
+        }
+        if (itemQty > 1) {
+            return " " + unitName + "s";
+        } else {
+            return " " + unitName;
+        }
     }
 };
 
