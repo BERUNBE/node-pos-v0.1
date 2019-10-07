@@ -14,16 +14,28 @@ module.exports = function main(inputs) {
             }
         });
 
-        // inputs.forEach(function(input) {
-        //     output += "Name: " + input.Name + ", Quantity: " + input.Unit + ", Unit price: " + input.Price + "(yuan)" + "\n";
-        // });
+        var total = 0;
         uniqueItems.forEach(function(item) {
             var items = inputs.filter(input => input.Barcode == item.Barcode);
             var prices = items.map(item => item.Price);
             var reducer = (accumulator, currentValue) => accumulator + currentValue;
             var totalPrice = prices.reduce(reducer);
-            output += "Name: " + item.Name + ", Quantity: " + items.length + " " + item.Unit + ", Unit price: " + item.Price.toFixed(2) + " (yuan), Subtotal: " + totalPrice.toFixed(2) + " (yuan)\n";
+            total += totalPrice;
+            var unit = getUnit(item.Unit, items.length);
+            output += "Name: " + item.Name + ", Quantity: " + items.length + unit + ", Unit price: " + item.Price.toFixed(2) + " (yuan), Subtotal: " + totalPrice.toFixed(2) + " (yuan)\n";
         });
+
+        output += "----------------------\n";
+        output += "Total: " + total.toFixed(2) + " (yuan)\n";
+        output += "**********************\n"
+
+        function getUnit(unitName, itemQty){
+            if(itemQty > 1) {
+                return " " + unitName + "s";
+            } else {
+                return "";
+            }
+        }
 
         return output;
     }
